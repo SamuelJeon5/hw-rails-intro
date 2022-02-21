@@ -10,7 +10,14 @@ class MoviesController < ApplicationController
     def index
       @all_ratings = Movie.ratings
       @ratings_to_show = Array.new
-  
+      @sort = params[:sort]
+      @movies = Movie.all.order(@sort)
+      # if !params[:home] and session[:sort]
+      #   @sort = session[:sort]
+      # end
+      
+      
+      
       if params[:home] and params[:ratings]
         @ratings_to_show = params[:ratings].keys
       elsif !params[:home] and session[:ratings]
@@ -18,10 +25,7 @@ class MoviesController < ApplicationController
       end
       @movies = Movie.with_ratings(@ratings_to_show)
   
-      @sort = params[:sort]
-      if !params[:home] and session[:sort]
-        @sort = session[:sort]
-      end
+      
       @movies = @movies.order(@sort)
   
       session[:ratings] = Hash[@ratings_to_show.collect {|r| [r, 1]}]
