@@ -9,29 +9,38 @@ class MoviesController < ApplicationController
   
     def index
       @all_ratings = Movie.ratings
+      
       @ratings_to_show = Array.new
-      @sort = params[:sort]
-      @movies = Movie.all.order(@sort)
-      # if !params[:home] and session[:sort]
-      #   @sort = session[:sort]
-      # end
-      
-      
+      # @sort = params[:sort]
+      # @movies = Movie.all.order(@sort)
       
       if params[:home] and params[:ratings]
         @ratings_to_show = params[:ratings].keys
       elsif !params[:home] and session[:ratings]
         @ratings_to_show = session[:ratings].keys
       end
-      @movies = Movie.with_ratings(@ratings_to_show)
-  
       
-      @movies = @movies.order(@sort)
-  
+      # if !params[:home] and params[:ratings]
+      #   @ratings_to_show = params[:ratings].keys
+      # end
+      
+      @movies = Movie.with_ratings(@ratings_to_show)
+      @sort = params[:sort]
+      if !params[:home] and params[:sort]
+        @sort = params[:sort]
+      elsif !params[:home] and session[:sort]
+        @sort = session[:sort]
+      end
+
+      @movies = @movies.order(@sort) if params[:sort] != ''
+
       session[:ratings] = Hash[@ratings_to_show.collect {|r| [r, 1]}]
       session[:sort] = @sort
+      
     end
-  
+      
+ 
+
     def new
       # default: render 'new' template
     end
@@ -66,4 +75,4 @@ class MoviesController < ApplicationController
     def movie_params
       params.require(:movie).permit(:title, :rating, :description, :release_date)
     end
-  end
+end
